@@ -58,7 +58,6 @@ html >::-webkit-scrollbar-thumb:hover {
 }
 body {
   cursor: url("https://cdn.jsdelivr.net/gh/xuloveforever/cdn@6.2/images/Arrow.cur"), auto;
-  background-color: ;
   text-rendering: optimizelegibility;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   line-height: 1.65;
