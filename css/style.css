@@ -57,7 +57,7 @@ html >::-webkit-scrollbar-thumb:hover {
   background: #ff5722;
 }
 body {
-  cursor: url("https://cdn.jsdelivr.net/gh/TRHX/CDN-for-itrhx.com@2.1.6/images/mouse.cur"), auto;
+  cursor: url("https://cdn.jsdelivr.net/gh/xuloveforever/cdn@6.2/images/Arrow.cur"), auto;
   background-color: ;
   text-rendering: optimizelegibility;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -126,6 +126,16 @@ a:hover {
 }
 a:not([href]) {
   cursor: default;
+}
+canvas {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  min-width: 100%;
+  min-height: 100%;
+  height: auto;
+  width: auto;
+  z-index: -1;
 }
 pre {
   tab-size: 4;
