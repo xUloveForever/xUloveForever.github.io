@@ -457,9 +457,158 @@ __  __/\ /\| | _____   _____  / __\__  _ __ _____   _____ _ __
         
           
         
+          
+        
       
     
     
+      
+        
+          <div class='post-wrapper'>
+            <article class="post white-box shadow reveal ">
+  
+
+
+  <section class='meta'>
+    
+      
+      
+      <div class="meta" id="header-meta">
+        
+          
+  <h2 class="title">
+    <a href="/2020/05/06/docker%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/">
+      docker数据管理
+    </a>
+  </h2>
+
+
+        
+        <div class='new-meta-box'>
+          
+            
+          
+            
+              
+<div class='new-meta-item author'>
+  <a href="https://xUloveForever.github.io" rel="nofollow">
+    <img src="https://cdn.jsdelivr.net/gh/xuloveforever/cdn@6.0/images/avatar.png">
+    <p>xUloveForever</p>
+  </a>
+</div>
+
+            
+          
+            
+              
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Docker/' rel="nofollow">
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <p>Docker</p>
+    </a>
+  </div>
+
+
+            
+          
+            
+              <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2020年5月6日</p>
+  </a>
+</div>
+
+            
+          
+            
+              
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：663字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：2分钟</p>
+    </a>
+  </div>
+
+
+            
+          
+            
+              
+
+            
+          
+        </div>
+        
+          <hr>
+        
+      </div>
+    
+  </section>
+
+
+  <section class="article typo">
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="对于Docker数据管理的学习"><a href="#对于Docker数据管理的学习" class="headerlink" title="对于Docker数据管理的学习"></a>对于Docker数据管理的学习</h4><p>docker数据管理的作用：</p>
+<p>​    1.对数据进行持久化</p>
+<p>​    2.在多个容器之间进行数据共享</p>
+<p>docker中管理数据的两种方式</p>
+<p>​    1.数据卷：容器内数据直接映射到宿主机环境</p>
+<p>​    2.数据卷容器：使用特定的容器维护数据卷</p>
+<p>一、数据卷</p>
+<p>​    它是一个可以供容器使用的特殊目录，它将主机操作系统目录直接映射进器，类似于Linux中的mount</p>
+<p>​    <strong>特性</strong></p>
+<pre><code>* 可以在容器之间共享和重用，容器间传递数据将变得高效与方便
+* 对数据卷数据的修改会立马生效，无论是容器内操作还是宿主机中
+* 对数据卷的更新不会影响镜像，解耦开应用和数据
+* 卷会一直存在，直到没有容器使用，可以安全地卸载它</code></pre><p>​    <strong>创建数据卷</strong></p>
+<p>​    使用volume命令来管理数据卷，下面创建方式在/var/lib/docker/volumes文件夹下：</p>
+<p><code>docker volume create -d local test</code></p>
+<p>​    该命令支持参数：inspect(查看详细信息)、ls、prune(清理无用数据卷)、rm</p>
+<p>​    <strong>绑定数据卷</strong></p>
+<p>​    在创建容器时将主机本地的任意路径挂载到容器内作为数据卷</p>
+<p>​    创建使用-mount参数来使用，等同于旧的-v参数</p>
+<p>​    -mount参数支持三种类型的数据卷：</p>
+<ul>
+<li>volume：普通数据卷，映射到主机/var/lib/docker/volumes路径下</li>
+<li>bind：绑定数据卷，映射到主机指定路径下</li>
+<li>tmpfs：临时数据卷，只存在于内存中</li>
+</ul>
+<p>二、数据卷容器</p>
+<p>​    目的：专门提供数据卷给其他容器挂载</p>
+<p>​    1.先创建一个数据卷容器</p>
+<p><code>docker run -it -v /dbdata --name dbdata ubuntu</code></p>
+<p>​    2.在其他容器中使用-volumes-from来挂载dbdata容器中的数据卷</p>
+<p><code>docker run -it --volumes-from dbdata --name db1 ubuntu</code></p>
+<p><code>docker run -d --name db2--volumes-from db1 training/postgres</code></p>
+<p>​    注意：如果删除了挂载的容器，数据卷并不会被自动删除，如果要删除一个数据卷，必须在删除最后一个还挂载着它的容器时显示的使用docker rm -v命令来指定同时删除关联的容器</p>
+<p>三、使用数据卷容器迁移数据</p>
+<p>​    1.备份</p>
+<p>​    <code>docker run --voluumes-from dbdata -v $(pwd):/backup --name worker ubuntu tar cvf /backup/back.tar /dbdata</code></p>
+<p>​    2.恢复</p>
+<p>​    首先创建一个带有数据卷的容器dbdata2</p>
+<p><code>docker run -v /dbdata --name dbdata2 ubuntu /bin/bash</code></p>
+<p>​    再创建另一个新的容器，挂载dbdata2的容器，并使用untar解压备份文件到所挂载的容器卷中：</p>
+<p><code>docker run --volumes-from dbdata2 -v $(pwd):/backup busybox tar xvf /backup/backup.tar</code></p>
+
+      
+    </div>
+    
+      
+    
+  </section>
+</article>
+
+          </div>
+        
       
         
           <div class='post-wrapper'>
@@ -813,6 +962,11 @@ __  __/\ /\| | _____   _____  / __\__  _ __ _____   _____ _ __
       <ul class="entry navigation">
         
           <li><a class="flat-box"
+            title="/categories/Docker/" href="/categories/Docker/"
+            id="categoriesDocker"
+            ><div class='name'>Docker</div><div class='badge'>(1)</div></a></li>
+        
+          <li><a class="flat-box"
             title="/categories/%E6%B5%8B%E8%AF%95/" href="/categories/%E6%B5%8B%E8%AF%95/"
             id="categoriesE6B58BE8AF95"
             ><div class='name'>测试</div><div class='badge'>(1)</div></a></li>
@@ -839,7 +993,7 @@ __  __/\ /\| | _____   _____  / __\__  _ __ _____   _____ _ __
 
 
     <div class='content'>
-      <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 14px; color: #999">学习</a> <a href="/tags/%E7%94%9F%E6%B4%BB/" style="font-size: 14px; color: #999">生活</a>
+      <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 14px; color: #999">学习</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" style="font-size: 14px; color: #999">数据管理</a> <a href="/tags/%E7%94%9F%E6%B4%BB/" style="font-size: 14px; color: #999">生活</a>
     </div>
   </section>
 
@@ -871,7 +1025,7 @@ __  __/\ /\| | _____   _____  / __\__  _ __ _____   _____ _ __
       list-max-height='340px'
       server='netease'
       type='playlist'
-      id='138427269'
+      id='5006202821'
       list-folded='true'>
     </meting-js>
   
